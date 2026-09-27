@@ -16,9 +16,10 @@ Use the buttons below to get started 👇`,
 
   subscription: `💳 *Subscription Plans*
 
-• *Starter* — $XX/mo — 1 bot, basic strategy
-• *Pro* — $XX/mo — up to 5 bots, advanced strategies
-• *Elite* — $XX/mo — unlimited bots, priority support
+- *FREE* — 0.01% builder fee — 3 bots (Grid, DCA, Webhook/Signal, Combo)
+- *DEMO* — 0.03% builder fee — 7-day trial of our flagship Quant Bot, running 3 built-in trading systems
+- *Pro* — $65/mo — no builder fee — up to 10 bots, MVP Quant Bot engineered for steady, risk-managed performance
+- *Unlimited* — $300/6mo — unlimited bots, MVP Quant Bot, priority support
 
 Payments are coming soon — for now, message us here to reserve a plan.`,
 
