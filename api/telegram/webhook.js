@@ -40,15 +40,15 @@ Our proprietary bot, currently in its final testing stage. It combines 3 differe
 *How do I get started?*
 Tap "🚀 Setup Guide" below.`,
 
-  setup: `🚀 *Setup Guide*
+    setup: `🚀 *Setup Guide*
 
-1️⃣ Open our website: https://your-domain.com
-2️⃣ Connect your wallet (e.g. MetaMask)
+1️⃣ Open our website: [hyper-quantbot.vercel.app](https://hyper-quantbot.vercel.app/) — for best results, open it through your wallet's built-in browser
+2️⃣ Connect your wallet (e.g. MetaMask or Rabby)
 3️⃣ Create a trading *agent* — a limited-permission key that lets our bots trade for you, without custody of your funds
-4️⃣ Come back here and pick a subscription plan to activate your bot
+4️⃣ Approve the builder fee (0.01% on FREE, 0.03% for the Quant Bot on DEMO)
+5️⃣ Choose your bot type (Grid/DCA/Combo/Quant) and configure it
 
-Stuck? Just send us a message here.`,
-
+⚠️ *Note:* the MVP Quant Bot doesn't have flexible settings yet — it runs on built-in algorithms.`,
   unknown: `I didn't understand that 🤔 Use /start to open the menu.`,
 };
 // ============================================================
