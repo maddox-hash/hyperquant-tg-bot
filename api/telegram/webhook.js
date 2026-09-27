@@ -25,11 +25,17 @@ Payments are coming soon — for now, message us here to reserve a plan.`,
 
   faq: `❓ *FAQ*
 
-*What does this bot do?*
-It manages access to our Hyperliquid trading bot service — plans, setup guidance and support.
+*What bots do you offer?*
+Classic DCA, Grid and Combo bots — with the option to add indicators, signals and webhooks. Flexible trailing is supported too, including per-level trailing inside the Grid bot.
 
 *Do you have access to my funds?*
-No. You only connect your wallet and create a trading *agent* on our website. We never hold your funds or private keys.
+No. You only create a trading *agent* on Hyperliquid and connect its API so our bots can trade on your behalf. We never hold your funds or private keys. A trading agent can't withdraw or transfer your funds — this is documented in Hyperliquid's own docs.
+
+*What is the 0.01% builder fee?*
+It's our service fee on top of Hyperliquid's own exchange fee (0.015%). It only applies on the FREE plan. The DEMO plan carries a separate 0.03% fee for trading with the Quant Bot.
+
+*What is Quant Bot?*
+Our proprietary bot, currently in its final testing stage. It combines 3 different market-analysis systems. As our flagship product, it deserves a deeper explanation — a dedicated guide is on the way, but feel free to ask us here in the meantime.
 
 *How do I get started?*
 Tap "🚀 Setup Guide" below.`,
