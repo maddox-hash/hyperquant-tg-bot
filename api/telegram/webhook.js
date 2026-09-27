@@ -8,7 +8,7 @@ const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 //  EDIT YOUR TEXTS HERE — this is the only part you need to touch
 // ============================================================
 const TEXTS = {
-  welcome: `👋 Welcome to *HyperBots*!
+  welcome: `👋 Welcome to *HyperQuant*!
 
 I help you set up and manage automated trading bots on Hyperliquid.
 
