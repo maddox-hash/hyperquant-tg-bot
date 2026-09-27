@@ -1,0 +1,141 @@
+// api/telegram/webhook.js
+// Vercel serverless function — Telegram sends every update here via webhook.
+
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
+
+// ============================================================
+//  EDIT YOUR TEXTS HERE — this is the only part you need to touch
+// ============================================================
+const TEXTS = {
+  welcome: `👋 Welcome to *HyperBots*!
+
+I help you set up and manage automated trading bots on Hyperliquid.
+
+Use the buttons below to get started 👇`,
+
+  subscription: `💳 *Subscription Plans*
+
+• *Starter* — $XX/mo — 1 bot, basic strategy
+• *Pro* — $XX/mo — up to 5 bots, advanced strategies
+• *Elite* — $XX/mo — unlimited bots, priority support
+
+Payments are coming soon — for now, message us here to reserve a plan.`,
+
+  faq: `❓ *FAQ*
+
+*What does this bot do?*
+It manages access to our Hyperliquid trading bot service — plans, setup guidance and support.
+
+*Do you have access to my funds?*
+No. You only connect your wallet and create a trading *agent* on our website. We never hold your funds or private keys.
+
+*How do I get started?*
+Tap "🚀 Setup Guide" below.`,
+
+  setup: `🚀 *Setup Guide*
+
+1️⃣ Open our website: https://your-domain.com
+2️⃣ Connect your wallet (e.g. MetaMask)
+3️⃣ Create a trading *agent* — a limited-permission key that lets our bots trade for you, without custody of your funds
+4️⃣ Come back here and pick a subscription plan to activate your bot
+
+Stuck? Just send us a message here.`,
+
+  unknown: `I didn't understand that 🤔 Use /start to open the menu.`,
+};
+// ============================================================
+
+const MAIN_MENU = {
+  inline_keyboard: [
+    [{ text: '💳 Subscription', callback_data: 'menu_subscription' }],
+    [{ text: '❓ FAQ', callback_data: 'menu_faq' }],
+    [{ text: '🚀 Setup Guide', callback_data: 'menu_setup' }],
+  ],
+};
+
+const BACK_MENU = {
+  inline_keyboard: [[{ text: '⬅️ Back to menu', callback_data: 'menu_main' }]],
+};
+
+async function callTelegram(method, payload) {
+  const res = await fetch(`${API_URL}/${method}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return res.json();
+}
+
+const sendMessage = (chatId, text, keyboard) =>
+  callTelegram('sendMessage', {
+    chat_id: chatId,
+    text,
+    parse_mode: 'Markdown',
+    reply_markup: keyboard,
+  });
+
+const editMessage = (chatId, messageId, text, keyboard) =>
+  callTelegram('editMessageText', {
+    chat_id: chatId,
+    message_id: messageId,
+    text,
+    parse_mode: 'Markdown',
+    reply_markup: keyboard,
+  });
+
+const answerCallback = (callbackQueryId) =>
+  callTelegram('answerCallbackQuery', { callback_query_id: callbackQueryId });
+
+module.exports = async (req, res) => {
+  // Quick browser check — Telegram only ever sends POST
+  if (req.method !== 'POST') {
+    res.status(200).send('Bot webhook is running ✅');
+    return;
+  }
+
+  const update = req.body;
+
+  try {
+    // --- Regular text messages, e.g. /start ---
+    if (update.message) {
+      const chatId = update.message.chat.id;
+      const text = update.message.text || '';
+
+      if (text === '/start' || text === '/menu') {
+        await sendMessage(chatId, TEXTS.welcome, MAIN_MENU);
+      } else {
+        await sendMessage(chatId, TEXTS.unknown, MAIN_MENU);
+      }
+    }
+
+    // --- Button presses ---
+    if (update.callback_query) {
+      const cq = update.callback_query;
+      const chatId = cq.message.chat.id;
+      const messageId = cq.message.message_id;
+
+      await answerCallback(cq.id); // stops the button's loading spinner
+
+      switch (cq.data) {
+        case 'menu_main':
+          await editMessage(chatId, messageId, TEXTS.welcome, MAIN_MENU);
+          break;
+        case 'menu_subscription':
+          await editMessage(chatId, messageId, TEXTS.subscription, BACK_MENU);
+          break;
+        case 'menu_faq':
+          await editMessage(chatId, messageId, TEXTS.faq, BACK_MENU);
+          break;
+        case 'menu_setup':
+          await editMessage(chatId, messageId, TEXTS.setup, BACK_MENU);
+          break;
+      }
+    }
+
+    res.status(200).send('OK');
+  } catch (err) {
+    console.error(err);
+    res.status(200).send('OK'); // always 200, so Telegram doesn't retry forever
+  }
+};
