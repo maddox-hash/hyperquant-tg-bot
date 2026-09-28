@@ -173,7 +173,7 @@ module.exports = async (req, res) => {
           // Sends photo + caption. Put bots.jpg into /public folder of your Vercel project
           await sendPhoto(
             chatId,
-            'https://hyper-quantbot.vercel.app/bots.jpg',
+            'https://hyperquant-tg-bot.vercel.app/bots.jpg',
             TEXTS.faq_bots,
             FAQ_BACK
           );
