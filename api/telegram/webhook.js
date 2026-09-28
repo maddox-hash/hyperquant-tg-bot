@@ -15,8 +15,7 @@ Use the buttons below to get started 👇`,
 - *Free* — 0.01% builder fee — 3 bots (Grid, DCA, Webhook/Signal, Combo)
 - *Demo* — 0.03% builder fee — 7-day trial of our Quant Bot, running 3 built-in trading systems
 - *PRO* — $65/mo — no builder fee — up to 10 bots, 3 Quant Bots engineered for steady, risk-managed performance
-- *Unlimited* — $300/6mo — up to 20 bots, 5 Quant Bots, priority support
-Payments are coming soon — for now, message us here to reserve a plan.`,
+- *Unlimited* — $300/6mo — up to 20 bots, 5 Quant Bots, priority support`,
 
   // FAQ overview — only questions are shown
   faq: `❓ *FAQ*
@@ -25,6 +24,8 @@ Tap a question below to see the answer:`,
   // Individual FAQ answers
   faq_bots: `*What bots do you offer?*
 Classic DCA, Grid and Combo bots — with the option to add indicators, signals and webhooks. Flexible trailing is supported too, including per-level trailing inside the Grid bot.
+
+*Quant Bot* — combines 3 built-in strategies to make decisions on trade entries.
 
 A *Custom Bot* is also in development — it will offer the most flexible settings.`,
 
@@ -35,7 +36,7 @@ No. You only create a trading *agent* on Hyperliquid and connect its API so our 
 It's our service fee on top of Hyperliquid's own exchange fee (0.015%). It only applies on the FREE plan. The DEMO plan carries a separate 0.03% fee for trading with the Quant Bot.`,
 
   faq_quant: `*What is Quant Bot?*
-Our proprietary bot, currently in its final testing stage. It combines 3 different market-analysis systems. As our flagship product, it deserves a deeper explanation — a dedicated guide is on the way, but feel free to ask us here in the meantime.`,
+Our proprietary bot, currently in its final testing stage. It combines 3 different market-analysis systems. It helps find good entry points alongside a major player while avoiding traps. As a last resort, the position is protected by a flexible stop loss. Quant Bot combines a comprehensive view of the market using the best technical analysis tools (chart), order flow (+ Price Action), liquidations and trading volume. The bot reduces risk in "bad" trades or deliberately avoids them. Despite its success, it is still in the final testing stage. Therefore, the price of the plan will be raised in the future, as this kind of load requires additional servers to maintain.`,
 
   faq_start: `*How do I get started?*
 Tap "🚀 Setup Guide" below or use the main menu.`,
@@ -107,15 +108,6 @@ const sendPhoto = (chatId, photoUrl, caption, keyboard) =>
   callTelegram('sendPhoto', {
     chat_id: chatId,
     photo: photoUrl,
-    caption,
-    parse_mode: 'Markdown',
-    reply_markup: keyboard,
-  });
-
-const sendAnimation = (chatId, animationUrl, caption, keyboard) =>
-  callTelegram('sendAnimation', {
-    chat_id: chatId,
-    animation: animationUrl,
     caption,
     parse_mode: 'Markdown',
     reply_markup: keyboard,
@@ -213,11 +205,11 @@ module.exports = async (req, res) => {
           await showScreen(cq, TEXTS.faq_fee, FAQ_BACK);
           break;
         case 'faq_quant':
-          // Sends GIF + caption. Put quantbot2.gif into /public folder of your Vercel project.
+          // Sends screenshot + caption. Put 23.jpeg into /public folder of your Vercel project.
           await deleteMessage(chatId, messageId);
-          await sendAnimation(
+          await sendPhoto(
             chatId,
-            'https://hyperquant-tg-bot.vercel.app/quantbot2.gif',
+            'https://hyperquant-tg-bot.vercel.app/23.jpeg',
             TEXTS.faq_quant,
             FAQ_BACK
           );
