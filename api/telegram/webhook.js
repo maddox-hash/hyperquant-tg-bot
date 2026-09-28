@@ -92,10 +92,7 @@ async function callTelegram(method, payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  const data = await res.json();
-  // Log Telegram errors so they don't fail silently
-  if (!data.ok) console.error(`Telegram ${method} failed:`, data);
-  return data;
+  return res.json();
 }
 
 const sendMessage = (chatId, text, keyboard) =>
@@ -110,6 +107,15 @@ const sendPhoto = (chatId, photoUrl, caption, keyboard) =>
   callTelegram('sendPhoto', {
     chat_id: chatId,
     photo: photoUrl,
+    caption,
+    parse_mode: 'Markdown',
+    reply_markup: keyboard,
+  });
+
+const sendAnimation = (chatId, animationUrl, caption, keyboard) =>
+  callTelegram('sendAnimation', {
+    chat_id: chatId,
+    animation: animationUrl,
     caption,
     parse_mode: 'Markdown',
     reply_markup: keyboard,
@@ -130,13 +136,13 @@ const deleteMessage = (chatId, messageId) =>
 const answerCallback = (callbackQueryId) =>
   callTelegram('answerCallbackQuery', { callback_query_id: callbackQueryId });
 
-// Shows a text screen. A photo message can't be edited into text,
+// Shows a text screen. A photo/GIF message can't be edited into text,
 // so in that case we delete it and send a fresh message instead.
 async function showScreen(cq, text, keyboard) {
   const chatId = cq.message.chat.id;
   const messageId = cq.message.message_id;
 
-  if (cq.message.photo) {
+  if (!cq.message.text) {
     await deleteMessage(chatId, messageId);
     await sendMessage(chatId, text, keyboard);
   } else {
@@ -207,7 +213,14 @@ module.exports = async (req, res) => {
           await showScreen(cq, TEXTS.faq_fee, FAQ_BACK);
           break;
         case 'faq_quant':
-          await showScreen(cq, TEXTS.faq_quant, FAQ_BACK);
+          // Sends GIF + caption. Put quantbot2.gif into /public folder of your Vercel project.
+          await deleteMessage(chatId, messageId);
+          await sendAnimation(
+            chatId,
+            'https://hyperquant-tg-bot.vercel.app/quantbot2.gif',
+            TEXTS.faq_quant,
+            FAQ_BACK
+          );
           break;
         case 'faq_start':
           await showScreen(cq, TEXTS.faq_start, FAQ_BACK);
