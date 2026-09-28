@@ -6,6 +6,15 @@ const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 // Placeholder payment address (USDT) — replace with the real per-user address later
 const PAYMENT_ADDRESS = '0x8E5B541b59C43cCD688215C1c52CB6E4B885D5e9';
 
+// Website with the bot builder
+const SITE_URL = 'https://hyper-quantbot.vercel.app/';
+
+// Placeholder support account — replace with the real one
+const SUPPORT_USERNAME = 'support_username';
+
+// Underscores break Telegram's legacy Markdown, so escape them in dynamic text
+const escapeMd = (s) => s.replace(/_/g, '\\_');
+
 // ============================================================
 //  EDIT YOUR TEXTS HERE — this is the only part you need to touch
 // ============================================================
@@ -15,14 +24,29 @@ I help you set up and manage automated trading bots on Hyperliquid.
 Use the buttons below to get started 👇`,
 
   subscription: (username) => `💳 *Subscription Plans*
-TG Nickname (for site): ${username ? '@' + username.replace(/_/g, '\\_') : 'not set'}
-Your subscription: Free (0.01% builder fee)
-Quant Bot: Demo (7-day trial starts with the creation of your first bot, 0.03% builder fee)
 
-- *Free* — 0.01% builder fee — 3 bots (Grid, DCA, Webhook/Signal, Combo)
-- *Demo* — 0.03% builder fee — 7-day trial of our Quant Bot, running 3 built-in trading systems
-- *PRO* — $65/mo — no builder fee — up to 10 bots, 3 Quant Bots engineered for steady, risk-managed performance
-- *Unlimited* — $300/6mo — up to 20 bots, 5 Quant Bots, priority support`,
+👤 *Your account*
+TG Nickname (for site): ${username ? '@' + escapeMd(username) : 'not set'}
+
+📦 *Your subscription*
+• Plan: *Free* — 0.01% builder fee
+• Quant Bot: *Demo* — 0.03% builder fee
+└ ⏳ 7-day trial starts when you create your first bot
+
+━━━━━━━━━━━━━━
+*Available plans*
+
+🆓 *Free* — 0.01% builder fee
+└ 3 bots (Grid, DCA, Webhook/Signal, Combo)
+
+🧪 *Demo* — 0.03% builder fee
+└ 7-day trial of our Quant Bot, running 3 built-in trading systems
+
+⚡ *PRO* — $65/mo
+└ No builder fee · up to 10 bots · 3 Quant Bots engineered for steady, risk-managed performance
+
+👑 *Unlimited* — $300/6mo
+└ Up to 20 bots · 5 Quant Bots · priority support`,
 
   // Payment screen
   payment: `💎 *Upgrade Plan*
@@ -38,6 +62,13 @@ Send *exactly* the amount of your plan in USDT. The network fee is not included 
 _Tap the address to copy it._
 
 After sending, press "✅ I've paid".`,
+
+  // Shown after pressing "I've paid"
+  payment_check: `⏳ *Checking your payment…*
+
+As soon as the payment is confirmed, your subscription will be upgraded automatically.
+
+Having trouble? Contact support: @${escapeMd(SUPPORT_USERNAME)}`,
 
   // FAQ overview — only questions are shown
   faq: `❓ *FAQ*
@@ -84,6 +115,7 @@ const MAIN_MENU = {
     [{ text: '💳 Subscription', callback_data: 'menu_subscription' }],
     [{ text: '❓ FAQ', callback_data: 'menu_faq' }],
     [{ text: '🚀 Setup Guide', callback_data: 'menu_setup' }],
+    [{ text: '🤖 Create a bot', url: SITE_URL }],
   ],
 };
 
@@ -105,6 +137,13 @@ const PAY_MENU = {
   ],
 };
 
+const PAY_CHECK_MENU = {
+  inline_keyboard: [
+    [{ text: '💬 Contact support', url: `https://t.me/${SUPPORT_USERNAME}` }],
+    [{ text: '🏠 Main menu', callback_data: 'menu_main' }],
+  ],
+};
+
 const FAQ_MENU = {
   inline_keyboard: [
     [{ text: 'What bots do you offer?', callback_data: 'faq_bots' }],
@@ -118,6 +157,14 @@ const FAQ_MENU = {
 
 const FAQ_BACK = {
   inline_keyboard: [
+    [{ text: '⬅️ Back to FAQ', callback_data: 'menu_faq' }],
+    [{ text: '🏠 Main menu', callback_data: 'menu_main' }],
+  ],
+};
+
+const FAQ_START = {
+  inline_keyboard: [
+    [{ text: '🚀 Setup Guide', callback_data: 'menu_setup' }],
     [{ text: '⬅️ Back to FAQ', callback_data: 'menu_faq' }],
     [{ text: '🏠 Main menu', callback_data: 'menu_main' }],
   ],
@@ -219,7 +266,8 @@ module.exports = async (req, res) => {
           await showScreen(cq, TEXTS.payment, PAY_MENU);
           break;
         case 'pay_done':
-          // Placeholder: intentionally no action for now
+          // Shows "checking payment" screen. Real verification is not implemented yet.
+          await showScreen(cq, TEXTS.payment_check, PAY_CHECK_MENU);
           break;
         case 'menu_faq':
           await showScreen(cq, TEXTS.faq, FAQ_MENU);
@@ -257,7 +305,7 @@ module.exports = async (req, res) => {
           );
           break;
         case 'faq_start':
-          await showScreen(cq, TEXTS.faq_start, FAQ_BACK);
+          await showScreen(cq, TEXTS.faq_start, FAQ_START);
           break;
       }
     }
