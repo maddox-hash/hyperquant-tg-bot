@@ -24,7 +24,9 @@ Tap a question below to see the answer:`,
 
   // Individual FAQ answers
   faq_bots: `*What bots do you offer?*
-Classic DCA, Grid and Combo bots — with the option to add indicators, signals and webhooks. Flexible trailing is supported too, including per-level trailing inside the Grid bot.`,
+Classic DCA, Grid and Combo bots — with the option to add indicators, signals and webhooks. Flexible trailing is supported too, including per-level trailing inside the Grid bot.
+
+A *Custom Bot* is also in development — it will offer the most flexible settings.`,
 
   faq_funds: `*Do you have access to my funds?*
 No. You only create a trading *agent* on Hyperliquid and connect its API so our bots can trade on your behalf. We never hold your funds or private keys. A trading agent can't withdraw or transfer your funds — this is documented in Hyperliquid's own docs.`,
@@ -38,7 +40,7 @@ Our proprietary bot, currently in its final testing stage. It combines 3 differe
   faq_start: `*How do I get started?*
 Tap "🚀 Setup Guide" below or use the main menu.`,
 
-setup: `🚀 *Setup Guide*
+  setup: `🚀 *Setup Guide*
 1️⃣ Open our website through your wallet's built-in browser: [hyper-quantbot.vercel.app](https://hyper-quantbot.vercel.app/)
 2️⃣ Connect your wallet (e.g. MetaMask or Rabby)
 3️⃣ Create a trading *agent* — a limited-permission key that lets our bots trade for you, without custody of your funds
@@ -48,6 +50,7 @@ setup: `🚀 *Setup Guide*
 
 ⚠️ *Note:* The MVP Quant Bot doesn't have flexible settings yet — it runs on built-in algorithms.
 ⚠️ *Note:* Backtesting is currently under development — always follow proper risk management.`,
+
   unknown: `I didn't understand that 🤔 Use /start to open the menu.`,
 };
 
@@ -96,6 +99,15 @@ const sendMessage = (chatId, text, keyboard) =>
   callTelegram('sendMessage', {
     chat_id: chatId,
     text,
+    parse_mode: 'Markdown',
+    reply_markup: keyboard,
+  });
+
+const sendPhoto = (chatId, photoUrl, caption, keyboard) =>
+  callTelegram('sendPhoto', {
+    chat_id: chatId,
+    photo: photoUrl,
+    caption,
     parse_mode: 'Markdown',
     reply_markup: keyboard,
   });
@@ -158,7 +170,13 @@ module.exports = async (req, res) => {
 
         // FAQ answers
         case 'faq_bots':
-          await editMessage(chatId, messageId, TEXTS.faq_bots, FAQ_BACK);
+          // Sends photo + caption. Put bots.jpg into /public folder of your Vercel project
+          await sendPhoto(
+            chatId,
+            'https://hyper-quantbot.vercel.app/bots.jpg',
+            TEXTS.faq_bots,
+            FAQ_BACK
+          );
           break;
         case 'faq_funds':
           await editMessage(chatId, messageId, TEXTS.faq_funds, FAQ_BACK);
