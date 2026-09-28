@@ -92,7 +92,10 @@ async function callTelegram(method, payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  return res.json();
+  const data = await res.json();
+  // Log Telegram errors so they don't fail silently
+  if (!data.ok) console.error(`Telegram ${method} failed:`, data);
+  return data;
 }
 
 const sendMessage = (chatId, text, keyboard) =>
@@ -121,8 +124,25 @@ const editMessage = (chatId, messageId, text, keyboard) =>
     reply_markup: keyboard,
   });
 
+const deleteMessage = (chatId, messageId) =>
+  callTelegram('deleteMessage', { chat_id: chatId, message_id: messageId });
+
 const answerCallback = (callbackQueryId) =>
   callTelegram('answerCallbackQuery', { callback_query_id: callbackQueryId });
+
+// Shows a text screen. A photo message can't be edited into text,
+// so in that case we delete it and send a fresh message instead.
+async function showScreen(cq, text, keyboard) {
+  const chatId = cq.message.chat.id;
+  const messageId = cq.message.message_id;
+
+  if (cq.message.photo) {
+    await deleteMessage(chatId, messageId);
+    await sendMessage(chatId, text, keyboard);
+  } else {
+    await editMessage(chatId, messageId, text, keyboard);
+  }
+}
 
 module.exports = async (req, res) => {
   // Quick browser check — Telegram only ever sends POST
@@ -156,21 +176,23 @@ module.exports = async (req, res) => {
 
       switch (cq.data) {
         case 'menu_main':
-          await editMessage(chatId, messageId, TEXTS.welcome, MAIN_MENU);
+          await showScreen(cq, TEXTS.welcome, MAIN_MENU);
           break;
         case 'menu_subscription':
-          await editMessage(chatId, messageId, TEXTS.subscription, BACK_MENU);
+          await showScreen(cq, TEXTS.subscription, BACK_MENU);
           break;
         case 'menu_faq':
-          await editMessage(chatId, messageId, TEXTS.faq, FAQ_MENU);
+          await showScreen(cq, TEXTS.faq, FAQ_MENU);
           break;
         case 'menu_setup':
-          await editMessage(chatId, messageId, TEXTS.setup, BACK_MENU);
+          await showScreen(cq, TEXTS.setup, BACK_MENU);
           break;
 
         // FAQ answers
         case 'faq_bots':
-          // Sends photo + caption. Put bots.jpg into /public folder of your Vercel project
+          // Sends photo + caption. Put bots.jpg into /public folder of your Vercel project.
+          // The old FAQ menu message is deleted so the photo replaces it.
+          await deleteMessage(chatId, messageId);
           await sendPhoto(
             chatId,
             'https://hyperquant-tg-bot.vercel.app/bots.jpg',
@@ -179,16 +201,16 @@ module.exports = async (req, res) => {
           );
           break;
         case 'faq_funds':
-          await editMessage(chatId, messageId, TEXTS.faq_funds, FAQ_BACK);
+          await showScreen(cq, TEXTS.faq_funds, FAQ_BACK);
           break;
         case 'faq_fee':
-          await editMessage(chatId, messageId, TEXTS.faq_fee, FAQ_BACK);
+          await showScreen(cq, TEXTS.faq_fee, FAQ_BACK);
           break;
         case 'faq_quant':
-          await editMessage(chatId, messageId, TEXTS.faq_quant, FAQ_BACK);
+          await showScreen(cq, TEXTS.faq_quant, FAQ_BACK);
           break;
         case 'faq_start':
-          await editMessage(chatId, messageId, TEXTS.faq_start, FAQ_BACK);
+          await showScreen(cq, TEXTS.faq_start, FAQ_BACK);
           break;
       }
     }
