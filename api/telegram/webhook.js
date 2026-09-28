@@ -16,10 +16,10 @@ Use the buttons below to get started 👇`,
 
   subscription: `💳 *Subscription Plans*
 
-- *FREE* — 0.01% builder fee — 3 bots (Grid, DCA, Webhook/Signal, Combo)
-- *DEMO* — 0.03% builder fee — 7-day trial of our flagship Quant Bot, running 3 built-in trading systems
-- *Pro* — $65/mo — no builder fee — up to 10 bots, MVP Quant Bot engineered for steady, risk-managed performance
-- *Unlimited* — $300/6mo — unlimited bots, MVP Quant Bot, priority support
+- *Free* — 0.01% builder fee — 3 bots (Grid, DCA, Webhook/Signal, Combo)
+- *Demo* — 0.03% builder fee — 7-day trial of our Quant Bot, running 3 built-in trading systems
+- *PRO* — $65/mo — no builder fee — up to 10 bots, 3 Quant Bots engineered for steady, risk-managed performance
+- *Unlimited* — $300/6mo — up to 20 bots, 5 Quant Bots, priority support
 
 Payments are coming soon — for now, message us here to reserve a plan.`,
 
