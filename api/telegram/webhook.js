@@ -36,7 +36,7 @@ No. You only create a trading *agent* on Hyperliquid and connect its API so our 
 It's our service fee on top of Hyperliquid's own exchange fee (0.015%). It only applies on the FREE plan. The DEMO plan carries a separate 0.03% fee for trading with the Quant Bot.`,
 
   faq_quant: `*What is Quant Bot?*
-Our proprietary bot, currently in its final testing stage. It combines 3 different market-analysis systems. It helps find good entry points alongside a major player while avoiding traps. As a last resort, the position is protected by a flexible stop loss. Quant Bot combines a comprehensive view of the market using the best technical analysis tools (chart), order flow (+ Price Action), liquidations and trading volume. The bot reduces risk in "bad" trades or deliberately avoids them. Despite its success, it is still in the final testing stage. Therefore, the price of the plan will be raised in the future, as this kind of load requires additional servers to maintain.`,
+Our proprietary bot, currently in its final testing stage. It combines 3 different market-analysis systems. It helps find good entry points alongside a major player while avoiding traps. As a last resort, the position is protected by a flexible stop loss. Quant Bot combines a comprehensive view of the market using the best technical analysis tools (chart), order flow (+ Price Action), liquidations and trading volume. The bot reduces risk in "bad" trades or deliberately avoids them. The plan price will be raised in the future, as this kind of load requires additional servers to maintain.`,
 
   faq_start: `*How do I get started?*
 Tap "🚀 Setup Guide" below or use the main menu.`,
