@@ -3,6 +3,9 @@
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
+// Placeholder payment address (USDT) — replace with the real per-user address later
+const PAYMENT_ADDRESS = '0x8E5B541b59C43cCD688215C1c52CB6E4B885D5e9';
+
 // ============================================================
 //  EDIT YOUR TEXTS HERE — this is the only part you need to touch
 // ============================================================
@@ -11,11 +14,30 @@ const TEXTS = {
 I help you set up and manage automated trading bots on Hyperliquid.
 Use the buttons below to get started 👇`,
 
-  subscription: `💳 *Subscription Plans*
+  subscription: (username) => `💳 *Subscription Plans*
+TG Nickname (for site): ${username ? '@' + username.replace(/_/g, '\\_') : 'not set'}
+Your subscription: Free (0.01% builder fee)
+Quant Bot: Demo (7-day trial starts with the creation of your first bot, 0.03% builder fee)
+
 - *Free* — 0.01% builder fee — 3 bots (Grid, DCA, Webhook/Signal, Combo)
 - *Demo* — 0.03% builder fee — 7-day trial of our Quant Bot, running 3 built-in trading systems
 - *PRO* — $65/mo — no builder fee — up to 10 bots, 3 Quant Bots engineered for steady, risk-managed performance
 - *Unlimited* — $300/6mo — up to 20 bots, 5 Quant Bots, priority support`,
+
+  // Payment screen
+  payment: `💎 *Upgrade Plan*
+Send *exactly* the amount of your plan in USDT. The network fee is not included — cover it on top so the full amount arrives:
+
+- *PRO* — 65 USDT (1 month)
+- *Unlimited* — 300 USDT (6 months)
+
+🌐 *Network:* you can use any of these — Arbitrum, BNB Smart Chain (BEP-20), Ethereum (ERC-20) or Base.
+
+🔐 This wallet is dedicated to you personally:
+\`${PAYMENT_ADDRESS}\`
+_Tap the address to copy it._
+
+After sending, press "✅ I've paid".`,
 
   // FAQ overview — only questions are shown
   faq: `❓ *FAQ*
@@ -67,6 +89,20 @@ const MAIN_MENU = {
 
 const BACK_MENU = {
   inline_keyboard: [[{ text: '⬅️ Back to menu', callback_data: 'menu_main' }]],
+};
+
+const SUBSCRIPTION_MENU = {
+  inline_keyboard: [
+    [{ text: '💎 Upgrade plan', callback_data: 'menu_pay' }],
+    [{ text: '⬅️ Back to menu', callback_data: 'menu_main' }],
+  ],
+};
+
+const PAY_MENU = {
+  inline_keyboard: [
+    [{ text: "✅ I've paid", callback_data: 'pay_done' }],
+    [{ text: '⬅️ Back', callback_data: 'menu_subscription' }],
+  ],
 };
 
 const FAQ_MENU = {
@@ -177,7 +213,13 @@ module.exports = async (req, res) => {
           await showScreen(cq, TEXTS.welcome, MAIN_MENU);
           break;
         case 'menu_subscription':
-          await showScreen(cq, TEXTS.subscription, BACK_MENU);
+          await showScreen(cq, TEXTS.subscription(cq.from.username), SUBSCRIPTION_MENU);
+          break;
+        case 'menu_pay':
+          await showScreen(cq, TEXTS.payment, PAY_MENU);
+          break;
+        case 'pay_done':
+          // Placeholder: intentionally no action for now
           break;
         case 'menu_faq':
           await showScreen(cq, TEXTS.faq, FAQ_MENU);
@@ -205,11 +247,11 @@ module.exports = async (req, res) => {
           await showScreen(cq, TEXTS.faq_fee, FAQ_BACK);
           break;
         case 'faq_quant':
-          // Sends screenshot + caption. Put 23.jpeg into /public folder of your Vercel project.
+          // Sends screenshot + caption. Put 23.jpg into /public folder of your Vercel project.
           await deleteMessage(chatId, messageId);
           await sendPhoto(
             chatId,
-            'https://hyperquant-tg-bot.vercel.app/23.jpeg',
+            'https://hyperquant-tg-bot.vercel.app/23.jpg',
             TEXTS.faq_quant,
             FAQ_BACK
           );
