@@ -12,6 +12,9 @@ const SITE_URL = 'https://hyper-quantbot.vercel.app/';
 // Placeholder support account — replace with the real one
 const SUPPORT_USERNAME = 'support_username';
 
+// Bot username for referral links (illusion only — no tracking)
+const BOT_USERNAME = 'hyperquant_trade_bot';
+
 // Underscores break Telegram's legacy Markdown, so escape them in dynamic text
 const escapeMd = (s) => s.replace(/_/g, '\\_');
 
@@ -23,7 +26,7 @@ const TEXTS = {
 I help you set up and manage automated trading bots on Hyperliquid.
 Use the buttons below to get started 👇`,
 
-  subscription: (username) => `💳 *Subscription Plans*
+  profile: (username, userId) => `👤 *My Profile*
 
 👤 *Your account*
 TG Nickname (for site): ${username ? '@' + escapeMd(username) : 'not set'}
@@ -32,6 +35,10 @@ TG Nickname (for site): ${username ? '@' + escapeMd(username) : 'not set'}
 • Plan: *Free* — 0.01% builder fee
 • Quant Bot: *Demo* — 0.03% builder fee
 └ ⏳ 7-day trial starts when you create your first bot
+
+🎁 *Referral program*
+• Paid referrals: *0* (50% commission)
+• Accumulated earnings: *$0*
 
 ━━━━━━━━━━━━━━
 *Available plans*
@@ -47,6 +54,17 @@ TG Nickname (for site): ${username ? '@' + escapeMd(username) : 'not set'}
 
 👑 *Unlimited* — $300/6mo
 └ Up to 20 bots · 5 Quant Bots · priority support`,
+
+  // Referral link screen (illusion — link has no functional tracking)
+  referral: (userId) => `🎁 *Your referral link*
+
+Share this link with friends:
+\`https://t.me/${BOT_USERNAME}?start=ref_${userId}\`
+
+_Tap the link to copy it._
+
+You receive *50%* of the subscription fee from every paid referral.
+Paid referrals and earnings are shown in My Profile.`,
 
   // Payment screen
   payment: `💎 *Upgrade Plan*
@@ -99,8 +117,9 @@ Tap "🚀 Setup Guide" below or use the main menu.`,
 2️⃣ Connect your wallet (e.g. MetaMask or Rabby)
 3️⃣ Create a trading *agent* — a limited-permission key that lets our bots trade for you, without custody of your funds
 4️⃣ Approve the builder fee if you don’t have a paid subscription (0.01%, 0.03% for the Quant Bot on DEMO)
-5️⃣ Choose your bot type (Grid / DCA / Combo / Quant) and configure it. Maximum leverage is limited to 3× for safety reasons
-6️⃣ Launch the bot and start earning according to your strategy!
+5️⃣ Sign / approve the *abstraction account* so the bot can see your available funds (otherwise the bot will not detect your balance)
+6️⃣ Choose your bot type (Grid / DCA / Combo / Quant) and configure it. Maximum leverage is limited to 3× for safety reasons
+7️⃣ Launch the bot and start earning according to your strategy!
 
 ⚠️ *Note:* The MVP Quant Bot doesn't have flexible settings yet — it runs on built-in algorithms.
 ⚠️ *Note:* Backtesting is currently under development — always follow proper risk management.`,
@@ -112,7 +131,7 @@ Tap "🚀 Setup Guide" below or use the main menu.`,
 
 const MAIN_MENU = {
   inline_keyboard: [
-    [{ text: '💳 Subscription', callback_data: 'menu_subscription' }],
+    [{ text: '👤 My Profile', callback_data: 'menu_profile' }],
     [{ text: '❓ FAQ', callback_data: 'menu_faq' }],
     [{ text: '🚀 Setup Guide', callback_data: 'menu_setup' }],
     [{ text: '🤖 Create a bot', url: SITE_URL }],
@@ -123,17 +142,25 @@ const BACK_MENU = {
   inline_keyboard: [[{ text: '⬅️ Back to menu', callback_data: 'menu_main' }]],
 };
 
-const SUBSCRIPTION_MENU = {
+const PROFILE_MENU = {
   inline_keyboard: [
     [{ text: '💎 Upgrade plan', callback_data: 'menu_pay' }],
+    [{ text: '🎁 My referral link', callback_data: 'menu_referral' }],
     [{ text: '⬅️ Back to menu', callback_data: 'menu_main' }],
+  ],
+};
+
+const REFERRAL_MENU = {
+  inline_keyboard: [
+    [{ text: '⬅️ Back to profile', callback_data: 'menu_profile' }],
+    [{ text: '🏠 Main menu', callback_data: 'menu_main' }],
   ],
 };
 
 const PAY_MENU = {
   inline_keyboard: [
     [{ text: "✅ I've paid", callback_data: 'pay_done' }],
-    [{ text: '⬅️ Back', callback_data: 'menu_subscription' }],
+    [{ text: '⬅️ Back', callback_data: 'menu_profile' }],
   ],
 };
 
@@ -240,7 +267,8 @@ module.exports = async (req, res) => {
       const chatId = update.message.chat.id;
       const text = update.message.text || '';
 
-      if (text === '/start' || text === '/menu') {
+      // Accept /start, /start ref_xxx, /menu — referral payload is ignored (illusion only)
+      if (text === '/start' || text.startsWith('/start ') || text === '/menu') {
         await sendMessage(chatId, TEXTS.welcome, MAIN_MENU);
       } else {
         await sendMessage(chatId, TEXTS.unknown, MAIN_MENU);
@@ -252,6 +280,8 @@ module.exports = async (req, res) => {
       const cq = update.callback_query;
       const chatId = cq.message.chat.id;
       const messageId = cq.message.message_id;
+      const userId = cq.from.id;
+      const username = cq.from.username;
 
       await answerCallback(cq.id); // stops the button's loading spinner
 
@@ -259,8 +289,11 @@ module.exports = async (req, res) => {
         case 'menu_main':
           await showScreen(cq, TEXTS.welcome, MAIN_MENU);
           break;
-        case 'menu_subscription':
-          await showScreen(cq, TEXTS.subscription(cq.from.username), SUBSCRIPTION_MENU);
+        case 'menu_profile':
+          await showScreen(cq, TEXTS.profile(username, userId), PROFILE_MENU);
+          break;
+        case 'menu_referral':
+          await showScreen(cq, TEXTS.referral(userId), REFERRAL_MENU);
           break;
         case 'menu_pay':
           await showScreen(cq, TEXTS.payment, PAY_MENU);
