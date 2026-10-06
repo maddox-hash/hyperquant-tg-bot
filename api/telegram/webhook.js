@@ -103,6 +103,13 @@ A *Custom Bot* is also in development — it will offer the most flexible settin
   faq_funds: `*Do you have access to my funds?*
 No. You only create a trading *agent* on Hyperliquid and connect its API so our bots can trade on your behalf. We never hold your funds or private keys. A trading agent can't withdraw or transfer your funds — this is documented in Hyperliquid's own docs.`,
 
+  faq_results: `*What results can I expect from the bot?*
+Backtests will soon be available to users. Income from Grid, DCA, Signal and Custom bots depends on your settings, risk level and market stage.
+
+*Quant Bot* is more universal — a smart trading system. It uses the best analysis methods to determine the strength of buyers or sellers, works 24/7 and without emotions. Over the past months it has shown solid results in both scalping and positional trading.
+
+Its strength is good performance in sideways markets, while still having a chance to catch a strong move — and most importantly, not getting hurt by a sharp exit of the asset from the range. This makes Quant Bot usable at any time.`,
+
   faq_fee: `*What is the 0.01% builder fee?*
 It's our service fee on top of Hyperliquid's own exchange fee (0.015%). It only applies on the FREE plan. The DEMO plan carries a separate 0.03% fee for trading with the Quant Bot.`,
 
@@ -175,6 +182,7 @@ const FAQ_MENU = {
   inline_keyboard: [
     [{ text: 'What bots do you offer?', callback_data: 'faq_bots' }],
     [{ text: 'Do you have access to my funds?', callback_data: 'faq_funds' }],
+    [{ text: 'What results can I expect?', callback_data: 'faq_results' }],
     [{ text: 'What is the 0.01% builder fee?', callback_data: 'faq_fee' }],
     [{ text: 'What is Quant Bot?', callback_data: 'faq_quant' }],
     [{ text: 'How do I get started?', callback_data: 'faq_start' }],
@@ -323,6 +331,16 @@ module.exports = async (req, res) => {
           break;
         case 'faq_funds':
           await showScreen(cq, TEXTS.faq_funds, FAQ_BACK);
+          break;
+        case 'faq_results':
+          // Sends tests.jpg + caption. File must be in /public of the Vercel project.
+          await deleteMessage(chatId, messageId);
+          await sendPhoto(
+            chatId,
+            'https://hyperquant-tg-bot.vercel.app/tests.jpg',
+            TEXTS.faq_results,
+            FAQ_BACK
+          );
           break;
         case 'faq_fee':
           await showScreen(cq, TEXTS.faq_fee, FAQ_BACK);
