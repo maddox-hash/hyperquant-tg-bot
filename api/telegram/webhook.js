@@ -3,9 +3,6 @@
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
-// Placeholder payment address (USDT) — replace with the real per-user address later
-const PAYMENT_ADDRESS = '0x8E5B541b59C43cCD688215C1c52CB6E4B885D5e9';
-
 // Website with the bot builder
 const SITE_URL = 'https://hyper-quantbot.vercel.app/';
 
@@ -49,10 +46,10 @@ TG Nickname (for site): ${username ? '@' + escapeMd(username) : 'not set'}
 🧪 *Demo* — 0.03% builder fee
 └ 7-day trial of our Quant Bot, running 3 built-in trading systems
 
-⚡ *PRO* — $65/mo
+⚡ *PRO* — $15/mo
 └ No builder fee · up to 10 bots · 3 Quant Bots engineered for steady, risk-managed performance
 
-👑 *Unlimited* — $300/6mo
+👑 *Unlimited* — $50/6mo
 └ Up to 20 bots · 5 Quant Bots · priority support`,
 
   // Referral link screen (illusion — link has no functional tracking)
@@ -68,23 +65,19 @@ Paid referrals and earnings are shown in My Profile.`,
 
   // Payment screen
   payment: `💎 *Upgrade Plan*
-Send *exactly* the amount of your plan in USDT. The network fee is not included — cover it on top so the full amount arrives:
 
-- *PRO* — 65 USDT (1 month)
-- *Unlimited* — 300 USDT (6 months)
+🧪 *Beta testing is currently underway.*
+Only the *free subscription* is available right now.
 
-🌐 *Network:* you can use any of these — Arbitrum, BNB Smart Chain (BEP-20), Ethereum (ERC-20) or Base.
+Paid plans will open after the beta:
+- *PRO* — $15 / month
+- *Unlimited* — $50 / 6 months
 
-🔐 This wallet is dedicated to you personally:
-\`${PAYMENT_ADDRESS}\`
-_Tap the address to copy it._
+Thank you for testing HyperQuant!`,
 
-After sending, press "✅ I've paid".`,
-
-  // Shown after pressing "I've paid"
-  payment_check: `⏳ *Checking your payment…*
-
-As soon as the payment is confirmed, your subscription will be upgraded automatically.
+  // Legacy payment check screen (kept for safety; not reachable while beta is free-only)
+  payment_check: `🧪 *Beta testing is currently underway.*
+Only the *free subscription* is available right now.
 
 Having trouble? Contact support: @${escapeMd(SUPPORT_USERNAME)}`,
 
@@ -141,7 +134,7 @@ const MAIN_MENU = {
     [{ text: '👤 My Profile', callback_data: 'menu_profile' }],
     [{ text: '❓ FAQ', callback_data: 'menu_faq' }],
     [{ text: '🚀 Setup Guide', callback_data: 'menu_setup' }],
-    [{ text: '🤖 Create a bot', url: SITE_URL }],
+    [{ text: '🤖 Create a bot (Beta)', url: SITE_URL }],
   ],
 };
 
@@ -166,7 +159,6 @@ const REFERRAL_MENU = {
 
 const PAY_MENU = {
   inline_keyboard: [
-    [{ text: "✅ I've paid", callback_data: 'pay_done' }],
     [{ text: '⬅️ Back', callback_data: 'menu_profile' }],
   ],
 };
